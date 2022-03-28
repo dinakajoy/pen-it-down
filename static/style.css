@@ -1,0 +1,111 @@
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f4f4f4;
+  font-family:Verdana, Geneva, Tahoma, sans-serif
+}
+
+.header {
+  text-align: center;
+  padding: 20px;
+  background-color: #000000c7;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #000000c7;
+  color: #fff;
+}
+
+.main {
+  width: 100%;
+  margin: 30px auto;
+  min-height: 73vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.input {
+  width: 80%;
+  display: flex;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.input input {
+  width: 80%;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #f4f4f4;
+  outline: 0;
+}
+
+.input button {
+  cursor: pointer;
+  width: 20%;
+  margin: 0 auto;
+  padding: 10px;
+  color: #fff;
+  background-color: #0a0202;
+  border: 1px solid #0a0202;
+  outline: 0;
+}
+
+.result {
+  width: 80%;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.wrapper h1 {
+  font-size: 1.2rem;
+}
+
+.readme {
+  margin-top: 20px;
+  line-height: 1.8;
+}
+
+.readme h1 {
+  font-size: 1rem;
+}
+
+.readme h2 {
+  font-size: .9rem;
+}
+
+.readme p {
+  font-size: .9rem;
+}
+
+.readme a {
+  color: #0a0202;
+}
+
+.readme a:hover {
+  color: #3d3737;
+}

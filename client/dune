@@ -1,0 +1,5 @@
+(executable
+ (name client)
+ (modes js)
+ (libraries shared js_of_ocaml-lwt brr)
+ (preprocess (pps js_of_ocaml-ppx)))
