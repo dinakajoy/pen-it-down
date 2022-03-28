@@ -4,8 +4,8 @@ synopsis: "A note-taking application"
 description: "This is a simple note-taking application"
 
 license: "MIT"
-homepage: "https://github.com/dinakajoy/note_app"
-bug-reports: "https://github.com/dinakajoy/note_app/issues"
+homepage: "https://github.com/dinakajoy/pen-it-down"
+bug-reports: "https://github.com/dinakajoy/pen-it-down/issues"
 
 author: "Odinaka Joy <dinakajoy@gmail.com> and Patrick Ferris <pf341@patricoferris.com>"
 maintainer: "Odinaka Joy <dinakajoy@gmail.com> and Patrick Ferris <pf341@patricoferris.com>"
