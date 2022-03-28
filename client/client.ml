@@ -1,10 +1,10 @@
 open Brr
 
-let display_text result = 
+(* let display_text result = 
   let result_element =  (Document.find_el_by_id G.document) (Jstr.v "result") in
   match result_element with
   | Some v -> El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) (Jstr.v result) v
-  | None -> ()
+  | None -> () *)
 
 let set_date () = 
   let date_span =  (Document.find_el_by_id G.document) (Jstr.v "date") in
@@ -14,4 +14,4 @@ let set_date () =
 
 let () =
   set_date ();
-  Lwt_main.run Shared.main
+  (* Lwt_main.run Shared.main *)

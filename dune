@@ -4,5 +4,3 @@
     (targets client.js)
     (mode promote)
     (action (copy %{deps} %{targets}))))
-
-; (data_only_dirs store)

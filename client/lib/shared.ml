@@ -1,6 +1,6 @@
 open Lwt.Syntax
 
-module Store = Irmin_unix.Git.FS.KV (Irmin.Contents.String)
+module Store = Irmin_mem.KV.Make (Irmin.Contents.String)
 module Client = Irmin_client_unix.Make (Store)
 
 let display_text result = 
@@ -8,7 +8,7 @@ let display_text result =
   let result_element =  (Document.find_el_by_id G.document) (Jstr.v "result") in
   match result_element with
   | Some v -> El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) (Jstr.v result) v
-  | None -> ()
+  | None -> () 
 
 let main =
   let uri = Uri.of_string "tcp://localhost:9090" in
@@ -17,6 +17,5 @@ let main =
   match result with
   | Ok _ -> display_text "OK"
   | Error _ -> display_text "Error"
-  (* Printf.printf "ERROR: %s\n" (Irmin_client.Error.to_string e) *)
 
 (* let n = Lwt_main.run main *)
