@@ -1,0 +1,114 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f4f4f4;
+  font-family:Verdana, Geneva, Tahoma, sans-serif
+}
+
+header,
+footer {
+  width: 100%;
+  text-align: center;
+  background-color: #333;
+  color: #fff;
+}
+
+header {
+  padding: 20px;
+}
+
+.footer {
+  padding: 10px;
+}
+
+.nav button {
+  background-color: #f4f4f4;
+  color: #333;
+  padding: 7px 10px;
+  border: 1px solid #f4f4f4;
+  border-radius: 20px;
+  outline: 0;
+  margin: 10px 0 0;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.main {
+  width: 100%;
+  margin: 20px auto;
+  min-height: 70vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.notes {
+  display: flex;
+  width: auto;
+}
+
+/* The Modal */
+.note_modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+.close_modal {
+  color: #aaa;
+  float: right;
+  right: 70px;
+  top: 10px;
+  font-size: 28px;
+  font-weight: bold;
+  position: relative;
+}
+
+.close_modal:hover,
+.close_modal:focus {
+  color: #4d4b4b;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal_content {
+  background-color: #fefefe;
+  margin: 1% auto;
+  padding: 10px 20px;
+  border: 1px solid #888;
+  width: 90%;
+  height: 95%;
+  display: flex;
+  flex-direction: row;
+}
+
+textarea {
+  width: 50%;
+  height: 100%;
+  padding: 10px;
+}
+
+.markdown_preview {
+  width: 48%;
+  height: 100%;
+  padding: 10px;
+  margin-left: 3px;
+  border: 1px solid #888;
+}
+/* End of Modal */

@@ -1,2 +1,2 @@
 _build/
-static/client.js
+dist/main.js

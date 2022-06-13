@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Note App</title>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Pen It Down</h1>
+      <div class="nav">
+        <button id="new_note">New Note</button>
+      </div>
+    </header>
+    <main class="main">
+      <section class="notes">
+        <div id="note_list" class="note_list"></div>
+        <div id="note_modal" class="note_modal">
+          <span id="close_modal" class="close_modal">&times;</span>
+          <div class="modal_content">
+            <textarea placeholder="Please type in note in markdown" id="markdown_content"></textarea>
+            <div id="markdown_preview" class="markdown_preview"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">&copy; <span id="year"></span></footer>
+    <script src="./main.js"></script>
+    <script>document.getElementById("year").innerHTML = new Date().getFullYear()</script>
+  </body>
+</html>

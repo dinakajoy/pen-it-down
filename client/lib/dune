@@ -1,5 +1,0 @@
-(library
- (name shared)
- (libraries irmin.mem irmin-server irmin-client-unix brr)
- (preprocess
-  (pps ppx_irmin)))
