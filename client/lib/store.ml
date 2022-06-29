@@ -1,5 +1,5 @@
 open Lwt.Infix
-(* open Lwt.Syntax *)
+open Lwt.Syntax
 module S = Irmin_mem.KV.Make (Irmin.Contents.String)
 module Client = Irmin_client_jsoo.Make (S)
 module Str = 
@@ -23,9 +23,9 @@ let info message () =
     ~author:"penit-client" message
 
 let local_commit t k v =
-  Str.set ~info:(info "some message goes here") t.staging k v >|= function
-  | Ok () -> Brr.Console.log [ Jstr.v "Successful commit" ]
-  | Error _ -> Brr.Console.warn [ Jstr.v "Set error" ]
+  Str.set ~info:(info "Saving...") t.staging k v >|= function
+  | Ok () -> Ok
+  | Error _ -> Error
 
 let local_get t k = Str.get t.staging k
 

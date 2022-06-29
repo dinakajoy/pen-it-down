@@ -1,5 +1,4 @@
 open Brr
-(* open Lwt.Syntax *)
 open Lwt.Infix
 
 let init () = Store.init (Uri.to_jstr (Window.location G.window))
@@ -16,11 +15,16 @@ let show_status msg =
   set_timeout ~ms:1000 @@ fun () -> display_text msg;
   set_timeout ~ms:2000 @@ fun () -> display_text ""
 
-(* let save_note note_name note_content =
+let commit s t =
+  Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
+      Store.local_commit s [ t.file ] (t.editor |> Jstr.to_string));
+  t
+
+let save_note note_name note_content =
   let res = Store.save_note_temp note_name note_content in
   match res with 
   | Ok () -> show_status "Successful commit"
-  | Error _ -> show_status "Set error" *)
+  | Error _ -> show_status "Set error"
   
 let get_note_name =
   let markdown_name_elem = (Document.find_el_by_id G.document) (Jstr.v "markdown_name") in
@@ -52,24 +56,20 @@ let display_notes elem =
     Store.list store >>= fun files ->
     let file = List.hd files in
     Store.local_get store [ file ] >>= fun content ->
+    Console.log ["content", content];
     El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) (Jstr.v content) elem;
-    (* El.set_children editable [ El.txt' content ];
-    El.set_children el [ editable ];
-    let initial = { file; files; editor = Jstr.v content } in
-    El.append_children el [ editor ~store ~initial ]; *)
     Lwt.return ()
   in
-  Lwt_js_events.async start
+  Js_of_ocaml_lwt.Lwt_js_events.async start
 
 let preview_markdown elem =
   let note_content = Jv.to_string elem in
   let markdown_preview_btn = (Document.find_el_by_id G.document) (Jstr.v "markdown_preview") in
   Option.iter (fun markdown_preview_elem -> 
-    let note_content_as_elem = Jstr.v (Omd.to_html (Omd.of_string (note_content))) in
-    El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_elem markdown_preview_elem
-    (* let note_name = get_note_name in
-    save_note note_name note_content *)
-    (* Lwt.async (fun _ -> save_note note_name note_content) *)
+    let note_content_as_value = Jstr.v (Omd.to_html (Omd.of_string (note_content))) in
+    El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_value markdown_preview_elem;
+    let note_name = get_note_name in
+    save_note note_name note_content
   ) markdown_preview_btn
 
 let main () =

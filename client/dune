@@ -3,14 +3,8 @@
  (modes js)
  (libraries
   js_of_ocaml-lwt
-  ; irmin-client-jsoo
-  ; digestif.ocaml
   brr
-  store
-  ; irmin
-  ; irmin.mem
-  ; irmin-indexeddb
-  ; irmin-git
-  omd)
+  omd
+  store)
  (preprocess
   (pps js_of_ocaml-ppx)))

@@ -2,7 +2,6 @@
  (name store)
  (libraries 
   brr
-  js_of_ocaml-lwt
   irmin-client-jsoo
   digestif.ocaml
   irmin
