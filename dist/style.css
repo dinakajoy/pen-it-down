@@ -9,7 +9,8 @@
 
 body {
   background-color: #f4f4f4;
-  font-family: Verdana, Geneva, Tahoma, sans-serif
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  color: #353434c9;
 }
 
 header,
@@ -41,7 +42,7 @@ header {
 }
 
 .main {
-  width: 100%;
+  width: 95%;
   margin: 20px auto;
   min-height: 70vh;
   overflow-x: hidden;
@@ -52,9 +53,92 @@ header {
   align-items: center;
 }
 
-.notes {
+.all_notes {
   display: flex;
   width: auto;
+}
+
+.note {
+  margin: 15px auto;
+  background-color: #ffffff6e;
+  padding: 8px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 0 #2b2b2b3b;
+  transition: all .5s;
+}
+
+.note:hover {
+  box-shadow: 0 0 0 #2b2b2b30;
+  color: #333;
+}
+
+.header_wrapper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.note_title {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative ;
+}
+
+.note_title::after {
+  content: "\270F";
+  margin-left: 5px;
+  position: absolute ;
+  -ms-transform: rotate(120deg);
+  transform: rotate(120deg);
+  color: rgb(66, 22, 22);
+}
+
+.note_title:hover {
+  text-decoration: underline;
+}
+
+.note_content {
+  margin-left: 20px;
+  font-size: .9rem;
+}
+
+.note_content ol,
+.note_content ul {
+  margin: 10px 0 10px 20px;
+}
+
+.note_content code {
+  font-size: 90%;
+  background-color: #f6f5f5fb;
+  color:#797373;
+  border-radius: 3px;
+  margin: 10px;
+}
+
+.note_content p code {
+  margin: 0;
+  padding: 0.2em;
+}
+
+.note_content pre code {
+  margin: 15px auto;
+  padding: .6rem;
+  display: inline-block;
+}
+
+.delete_icon {
+  cursor: pointer;
+  color: #fff;
+  background-color: #e41313d9;
+  padding: 3px 5px;
+  border-radius: 5px;
+  font-size: .7rem;
+}
+
+.delete_icon:hover {
+  box-shadow: 2px 2px 0 #2b2b2b3b;
 }
 
 /* The Modal */
@@ -127,24 +211,25 @@ input {
   width: 100%;
   height: 93%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 textarea {
-  width: 50%;
-  height: 100%;
-  max-height: 100%;
-  padding: 5px;
-  border: 0;
   background-color: #eeebeb6b;
-  border-right: 5px solid #888;
+  padding: 5px;
+  width: 100%;
+  max-width: 100%;
+  height: 50%;
+  max-height: 100%;
+  border: 0;
+  border-bottom: 5px solid #888;
 }
 
 .markdown_preview {
-  width: 49%;
-  height: 100%;
   padding: 10px;
-  margin-left: 3px;
+  width: 100%;
+  margin: 0;
+  margin-top: 3px;
 }
 
 .markdown_preview ul,
@@ -184,4 +269,33 @@ textarea {
   display: inline-block;
 }
 
+@media (min-width: 550px) {
+  .main {
+    width: 85%;
+  }
+
+  .modal_body {
+    flex-direction: row;
+  }
+  
+  textarea {
+    width: 50%;
+    height: 100%;
+    border: 0;
+    border-right: 5px solid #888;
+  }
+  
+  .markdown_preview {
+    width: 49%;
+    height: 100%;
+    margin: 0;
+    margin-left: 3px;
+  }
+}
+
+@media (min-width: 800px) {
+  .main {
+    width: 70%;
+  }
+}
 /* End of Modal */

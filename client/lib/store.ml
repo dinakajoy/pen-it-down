@@ -1,54 +1,50 @@
-open Lwt.Infix
 open Lwt.Syntax
 module S = Irmin_mem.KV.Make (Irmin.Contents.String)
 module Client = Irmin_client_jsoo.Make (S)
-module Str = 
+module KV = 
   Irmin_git.Generic_KV
     (Irmin_indexeddb.Content_store)
     (Irmin_indexeddb.Branch_store)
 
-let repo = "/tmp/penit"
+module Str = KV.Make (Irmin.Contents.String)
 
-(* let save_note note_name note_content =
+let sync_store path store =
   let uri = Uri.of_string "ws://localhost:9090/ws" in
   let config = Irmin_client_jsoo.config uri in
   let* repo = Client.Repo.v config in
   let* t = Client.main repo in
-  let+ () = Client.set_exn t ~info:Client.Info.none [ note_name ] note_content in
-  () *)
+  let+ () = Client.set_exn t ~info:Client.Info.none [ path ] store in
+  ()
+
+let get_path key =
+  Str.Schema.Path.v key
 
 let info message () =
-  Irmin.Info.v
-    ~date:(Unix.gettimeofday () |> Int64.of_float)
-    ~author:"penit-client" message
+  Str.Info.v
+    (Unix.gettimeofday () |> Int64.of_float)
+    ~author:"penit-client" ~message
 
-let local_commit t k v =
-  Str.set ~info:(info "Saving...") t.staging k v >|= function
-  | Ok () -> Ok
-  | Error _ -> Error
+let temporary_save t k v =
+  let+ response = Str.set ~info:(info "Saving note") t k v in
+  match response with
+  | Ok () -> "Saved..."
+  | Error _ -> "Error saving..."
 
-let local_get t k = Str.get t.staging k
+let temporary_delete t k =
+  let+ response = Str.remove ~info:(info "Deleting note") t k in
+  match response with
+  | Ok () -> "Deleted..."
+  | Error _ -> "Error deleting..."
+
+let get_content t k = Str.get t k
 
 let list t =
-  Str.list t.staging [] >>= fun lst -> Lwt.return @@ List.map fst lst
+  let* store_list = Str.list t [] in 
+  Lwt.return @@ List.map fst store_list
 
-let init uri =
-  let config =
-    Irmin_git.config ~bare:true
-      ~config:(Irmin_indexeddb.config "client-db")
-      repo
+let get_store () =
+  let config = Irmin_indexeddb.config "penit"
   in
-  Str.Repo.v config >>= fun repo ->
-  Str.master repo >>= fun main ->
-  (* Abusing the API here a little for this one off case... *)
-  sync ~merge:false { main; staging = main; uri } >>= fun _ ->
-  Str.Branch.find repo "staging" >>= fun commit ->
-  match commit with
-  | None ->
-      Str.clone ~src:main ~dst:"staging" >>= fun staging ->
-      Lwt.return { main; staging; uri }
-  | Some c ->
-      Str.of_branch repo "staging" >>= fun staging ->
-      Str.Head.get main >>= fun head ->
-      if compare_commit head c < 0 then Lwt.return { main; staging; uri }
-      else Lwt.return { main; staging; uri }
+  let* store_repo = Str.Repo.v config in 
+  let* store = Str.main store_repo in 
+  Lwt.return store

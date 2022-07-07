@@ -4,6 +4,7 @@
   brr
   irmin-client-jsoo
   digestif.ocaml
+  unix
   irmin
   irmin.mem
   irmin-indexeddb
