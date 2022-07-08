@@ -1,12 +1,12 @@
-val unit: 'a Lwt.t
+val display_status: string -> unit
 
-val display_text: string -> unit
+val show_status: string -> unit
 
-val show_status: unit
+(* val save_note: string -> string -> unit *)
 
-val save_note: string -> string -> unit Lwt.t
+val get_note_name: unit -> string
 
-val get_note_name: string
+val format_notes: string -> string -> Brr.El.t
 
 val open_modal: unit -> unit
 
@@ -14,6 +14,6 @@ val close_modal: unit -> unit
 
 val display_notes: Brr.El.t -> unit
 
-val preview_markdown: Jv.t -> unit
+val preview_markdown: string -> unit
 
 val main: unit -> unit

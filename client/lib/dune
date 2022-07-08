@@ -6,6 +6,5 @@
   digestif.ocaml
   unix
   irmin
-  irmin.mem
   irmin-indexeddb
   irmin-git))

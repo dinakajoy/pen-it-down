@@ -1,6 +1,6 @@
 (executables
  (names server)
- (libraries irmin.mem irmin-server)
+ (libraries irmin-unix irmin-server)
  (modules server)
  (preprocess
   (pps ppx_irmin)))

@@ -1,8 +1,6 @@
 open Brr
 open Lwt.Syntax
 
-(* let url = Uri.to_jstr (Window.location G.window) *)
-
 let display_status status =
   let status_element = (Document.find_el_by_id G.document) (Jstr.v "status") in
    Option.iter
@@ -14,6 +12,21 @@ let show_status msg =
   let set_timeout = fun ~ms f -> ignore @@ Jv.apply (Jv.get Jv.global "setTimeout") Jv.[| repr f; of_int ms |] in
   set_timeout ~ms:1000 @@ fun () -> display_status msg;
   set_timeout ~ms:2000 @@ fun () -> display_status ""
+
+let get_note_name () =
+  let markdown_name_elem = (Document.find_el_by_id G.document) (Jstr.v "markdown_name") in
+  match markdown_name_elem with
+  | Some elem ->
+    let note_name = Jstr.to_string (El.prop El.Prop.value elem) in
+    let key =
+    if (Jstr.is_empty (Jstr.of_string note_name))
+      then
+        let time = string_of_float (Unix.gettimeofday ()) in
+        let new_name = String.concat "-" ["unnamed_note"; time] in 
+        El.set_prop (El.Prop.jstr (Jstr.v "value")) (Jstr.v new_name) elem;
+        new_name
+    else note_name in key
+  | None -> "new_note"
 
 let set_modal_default_values note_title note_content = 
   let markdown_name_elem = (Document.find_el_by_id G.document) (Jstr.v "markdown_name") in
@@ -34,43 +47,22 @@ let set_modal_default_values note_title note_content =
 
 let delete_note note_name =
   let path = Store.get_path [note_name] in
-  let store_data () =
+  Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
     let* store = Store.get_store () in
     let* _ = Store.temporary_delete store path in
     Window.reload G.window;
-    Lwt.return ()
-  in
-  Js_of_ocaml_lwt.Lwt_js_events.async store_data
-
-let save_note note_name note_content =
-  let path = Store.get_path [note_name] in
-  let store_data () =
-    let* store = Store.get_store () in
-    let* result = Store.temporary_save store path note_content in
-    show_status result;
-    Lwt.return ()
-  in
-  Js_of_ocaml_lwt.Lwt_js_events.async store_data
-
-let get_note_name () =
-  let markdown_name_elem = (Document.find_el_by_id G.document) (Jstr.v "markdown_name") in
-  match markdown_name_elem with
-  | Some elem ->
-    let note_name = Jstr.to_string (El.prop El.Prop.value elem) in
-    let key =
-    if (Jstr.is_empty (Jstr.of_string note_name))
-      then
-        let time = string_of_float (Unix.gettimeofday ()) in
-        let new_name = String.concat "-" ["unnamed_note"; time] in 
-        El.set_prop (El.Prop.jstr (Jstr.v "value")) (Jstr.v new_name) elem;
-        new_name
-    else note_name in key
-  | None -> "new_note"
+    Lwt.return ())
 
 let save_note_every_two_seconds note_content = 
   let note_name = get_note_name () in
   let set_timeout = fun ~ms f -> ignore @@ Jv.apply (Jv.get Jv.global "setTimeout") Jv.[| repr f; of_int ms |] in
-  set_timeout ~ms:2000 @@ fun () -> save_note note_name note_content
+  set_timeout ~ms:2000 @@ fun () -> 
+    let path = Store.get_path [note_name] in
+    Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
+      let* store = Store.get_store () in
+      let* result = Store.temporary_save store path note_content in
+      show_status result;
+      Lwt.return ())
 
 let open_modal () =
   let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
@@ -80,13 +72,11 @@ let open_modal () =
     modal  
 
 let get_single_note note_title_to_edit =
-  let start () =
+  Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
     let* store = Store.get_store () in
     let* note_to_edit = Store.get_content store [ note_title_to_edit ] in
     set_modal_default_values (Jstr.v note_title_to_edit) (Jstr.v note_to_edit);
-    Lwt.return ()
-  in
-  Js_of_ocaml_lwt.Lwt_js_events.async start
+    Lwt.return ())
 
 let format_notes title content = 
   let header_wrapper_class = Jstr.v "header_wrapper" in
@@ -112,7 +102,6 @@ let format_notes title content =
   let note_as_markdown = Jstr.v (Omd.to_html (Omd.of_string content)) in
   let note_content_as_value = Jstr.v (Jstr.to_string (Jstr.concat [Jstr.slice ~start:0 ~stop:100 (note_as_markdown); Jstr.v "..."])) in
   El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_value div;
-
   let section = El.section ~at:At.[class' (Jstr.v "note")] [] in
   El.append_children section [header_wrapper; div];
   section
@@ -142,14 +131,6 @@ let list_notes () =
     (fun elem -> display_notes elem)
       note_list_div
 
-let close_modal () =
-  let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
-  Option.iter
-    (fun elem ->
-      list_notes ();
-      El.(set_inline_style Style.display (Jstr.v "none") elem))
-    modal
-
 let preview_markdown note_content =
   let markdown_preview_btn = (Document.find_el_by_id G.document) (Jstr.v "markdown_preview") in
   Option.iter (fun markdown_preview_elem -> 
@@ -157,7 +138,19 @@ let preview_markdown note_content =
     El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_value markdown_preview_elem
   ) markdown_preview_btn
 
+let close_modal () =
+  let push = Store.push_store () in 
+  Console.log ["push", push];
+  let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
+  Option.iter
+    (fun elem ->
+      list_notes ();
+      El.(set_inline_style Style.display (Jstr.v "none") elem))
+    modal
+
 let main () =
+  let pull = Store.pull_store () in 
+  Console.log ["pull", pull];
   list_notes ();
   let open_modal_btn = (Document.find_el_by_id G.document) (Jstr.v "new_note") in
   Option.iter
