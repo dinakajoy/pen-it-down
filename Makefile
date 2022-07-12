@@ -2,12 +2,13 @@ install:
 	opam install . --deps-only   
 
 build: 
-	dune build   
+	rm -rf dist/main.js   
+	dune build 
+
+run-server: 
+	dune exec ./server/server.exe  
 
 start: 
 	rm -rf dist/main.js   
 	dune build   
-	dune exec ./server/server.exe    
-
-run-server: 
-	dune exec ./server/server.exe
+	dune exec ./server/server.exe 
