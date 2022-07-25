@@ -11,31 +11,39 @@
 </head>
 
 <body>
-  <header class="header">
-    <h1>Pen It Down</h1>
-    <div class="nav">
-      <button id="new_note">New Note</button>
+  <section id="overlay">
+    <div class="loader loader-1">
+      <div class="loader-outter"></div>
+      <div class="loader-inner"></div>
     </div>
-  </header>
-  <main class="main">
-    <section class="all_notes">
-      <div id="note_list" class="note_list"></div>
-      <div id="note_modal" class="note_modal">
-        <div class="modal_content">
-          <div class="modal_header">
-            <input type="text" placeholder="Name of Note" id="markdown_name" />
-            <div>Status: <span class="status" id="status"></span></i></div>
-            <span id="close_modal" class="close_modal">&times;</span>
-          </div>
-          <div class="modal_body">
-            <textarea placeholder="Please type in note in markdown" id="markdown_content"></textarea>
-            <div id="markdown_preview" class="markdown_preview"></div>
+  </section>
+  <div id="content">
+    <header class="header">
+      <h1>Pen It Down</h1>
+      <div class="nav">
+        <button id="new_note">New Note</button>
+      </div>
+    </header>
+    <main class="main">
+      <section class="all_notes">
+        <div id="note_list" class="note_list"></div>
+        <div id="note_modal" class="note_modal">
+          <div class="modal_content">
+            <div class="modal_header">
+              <input type="text" placeholder="Name of Note" id="markdown_name" />
+              <div>Status: <span class="status" id="status"></span></i></div>
+              <span id="close_modal" class="close_modal">&times;</span>
+            </div>
+            <div class="modal_body">
+              <textarea placeholder="Please type in note in markdown" id="markdown_content"></textarea>
+              <div id="markdown_preview" class="markdown_preview"></div>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
-  <footer class="footer">&copy; <span id="year"></span></footer>
+      </section>
+    </main>
+    <footer class="footer">&copy; <span id="year"></span></footer>
+  </div>
   <script src="./main.js"></script>
   <script>document.getElementById("year").innerHTML = new Date().getFullYear()</script>
 </body>

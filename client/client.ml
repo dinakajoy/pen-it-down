@@ -1,6 +1,16 @@
 open Brr
 open Lwt.Syntax
 
+let get_loader_elem = (Document.find_el_by_id G.document) (Jstr.v "overlay")
+
+let get_content_wrapper = (Document.find_el_by_id G.document) (Jstr.v "content")
+  
+let stop_loader () = 
+  let loader = get_loader_elem in
+  Option.iter(fun elem -> El.(set_inline_style Style.display (Jstr.v "none") elem)) loader;
+  let content = get_content_wrapper in
+  Option.iter(fun elem -> El.(set_inline_style Style.display (Jstr.v "block") elem)) content
+
 let display_status status =
   let status_element = (Document.find_el_by_id G.document) (Jstr.v "status") in
   Option.iter
@@ -61,12 +71,19 @@ let set_modal_default_values note_title note_content =
         note_content_as_value markdown_preview_elem)
     markdown_preview
 
+let confirm_note_delete note_name =
+  let alert = Jv.get Jv.global "confirm" in
+  let alert v = Jv.apply alert Jv.[| of_string v |] in
+  alert (String.concat "" ["Are you sure you want to delete note "; "\""; note_name; "\""])
+
 let delete_note note_name =
-  let path = Store.get_path [ note_name ] in
-  Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
+  let reponse = Jv.to_bool (confirm_note_delete note_name) in
+  if reponse = true then 
+    let path = Store.get_path [ note_name ] in
+    Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
       let* store = Store.get_store () in
       let* _ = Store.temporary_delete store path in
-      Window.reload G.window;
+      let* _ = Store.push_store () in
       Lwt.return ())
 
 let save_note_every_two_seconds note_content =
@@ -149,20 +166,15 @@ let rec get_contents store files elem =
       get_contents store other_titles elem
 
 let display_notes elem =
-  let start () =
-    El.set_children elem [];
-    let* store = Store.get_store () in
-    let* files = Store.list store in
-    let* () = get_contents store files elem in
-    Lwt.return ()
-  in
-  Js_of_ocaml_lwt.Lwt_js_events.async start
+  El.set_children elem [];
+  let* store = Store.get_store () in
+  let* files = Store.list store in
+  let* () = get_contents store files elem in
+  Lwt.return ()
 
 let list_notes () =
-  let note_list_div =
-    (Document.find_el_by_id G.document) (Jstr.v "note_list")
-  in
-  Option.iter (fun elem -> display_notes elem) note_list_div
+  let note_list_div = Option.get @@ (Document.find_el_by_id G.document) (Jstr.v "note_list") in
+  display_notes note_list_div
 
 let preview_markdown note_content =
   let markdown_preview_btn =
@@ -178,25 +190,27 @@ let preview_markdown note_content =
         note_content_as_value markdown_preview_elem)
     markdown_preview_btn
 
+let push_str () =
+  let* _ = Store.push_store () in
+  Lwt.return ()
+
 let close_modal () =
-  (* let push = Store.push_store () in
-  Console.log [ ("push", push) ]; *)
+  let* () = push_str () in
   let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
-  Option.iter
-    (fun elem ->
-      list_notes ();
-      El.(set_inline_style Style.display (Jstr.v "none") elem))
-    modal
+  match modal with
+    | None -> Lwt.return ()
+    | Some modal ->
+      let+ () = list_notes () in
+      El.set_inline_style El.Style.display (Jstr.v "none") modal
 
 let pull_str () =
-  Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
-    let pull = Store.pull_store () in
-    Console.log [ ("pull", pull) ];
-    Lwt.return ())
+  let* _ = Store.pull_store () in
+  Lwt.return ()
 
 let main () =
-  pull_str ();
-  list_notes ();
+  let* () = pull_str () in
+  let* () = list_notes () in
+  stop_loader ();
   let open_modal_btn =
     (Document.find_el_by_id G.document) (Jstr.v "new_note")
   in
@@ -213,13 +227,13 @@ let main () =
   in
   Option.iter
     (fun elem ->
-      Ev.listen Ev.click (fun _ -> close_modal ()) (El.as_target elem))
+      Ev.listen Ev.click (fun _ -> Js_of_ocaml_lwt.Lwt_js_events.async close_modal) (El.as_target elem))
     close_modal_btn;
   let markdown_content =
     (Document.find_el_by_id G.document) (Jstr.v "markdown_content")
   in
-  Option.iter
-    (fun elem ->
+  match markdown_content with
+  | Some elem ->
       Ev.listen Ev.keyup
         (fun e ->
           let value =
@@ -227,7 +241,8 @@ let main () =
           in
           save_note_every_two_seconds value;
           preview_markdown value)
-        (El.as_target elem))
-    markdown_content
+          (El.as_target elem);
+          Lwt.return_unit
+       | None -> Lwt.return ()
 
-let () = main ()
+let () = Js_of_ocaml_lwt.Lwt_js_events.async main

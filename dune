@@ -4,3 +4,5 @@
     (targets main.js)
     (mode promote)
     (action (copy %{deps} %{targets}))))
+
+(vendored_dirs irmin-indexeddb)
