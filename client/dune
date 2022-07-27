@@ -1,5 +1,10 @@
 (executable
  (name client)
  (modes js)
- (libraries irmin.mem digestif.ocaml irmin-client-jsoo js_of_ocaml-lwt brr omd)
- (preprocess (pps js_of_ocaml-ppx)))
+ (libraries
+  js_of_ocaml-lwt
+  brr
+  omd
+  store)
+ (preprocess
+  (pps js_of_ocaml-ppx)))

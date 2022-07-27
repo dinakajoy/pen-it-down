@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <title>Note App</title>
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./style.css" />
+  <title>Note App</title>
+</head>
+
+<body>
+  <section id="overlay">
+    <div class="loader loader-1">
+      <div class="loader-outter"></div>
+      <div class="loader-inner"></div>
+    </div>
+  </section>
+  <div id="content">
     <header class="header">
       <h1>Pen It Down</h1>
       <div class="nav">
@@ -15,19 +25,27 @@
       </div>
     </header>
     <main class="main">
-      <section class="notes">
+      <section class="all_notes">
         <div id="note_list" class="note_list"></div>
         <div id="note_modal" class="note_modal">
-          <span id="close_modal" class="close_modal">&times;</span>
           <div class="modal_content">
-            <textarea placeholder="Please type in note in markdown" id="markdown_content"></textarea>
-            <div id="markdown_preview" class="markdown_preview"></div>
+            <div class="modal_header">
+              <input type="text" placeholder="Name of Note" id="markdown_name" />
+              <div>Status: <span class="status" id="status"></span></i></div>
+              <span id="close_modal" class="close_modal">&times;</span>
+            </div>
+            <div class="modal_body">
+              <textarea placeholder="Please type in note in markdown" id="markdown_content"></textarea>
+              <div id="markdown_preview" class="markdown_preview"></div>
+            </div>
           </div>
         </div>
       </section>
     </main>
     <footer class="footer">&copy; <span id="year"></span></footer>
-    <script src="./main.js"></script>
-    <script>document.getElementById("year").innerHTML = new Date().getFullYear()</script>
-  </body>
+  </div>
+  <script src="./main.js"></script>
+  <script>document.getElementById("year").innerHTML = new Date().getFullYear()</script>
+</body>
+
 </html>

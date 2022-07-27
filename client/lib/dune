@@ -1,0 +1,10 @@
+(library
+ (name store)
+ (libraries 
+  brr
+  irmin-client-jsoo
+  digestif.ocaml
+  unix
+  irmin
+  irmin-indexeddb
+  irmin-git))
