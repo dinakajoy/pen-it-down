@@ -1,6 +1,6 @@
 open Lwt.Syntax
-module Store = Irmin_unix.Git.FS.KV (Irmin.Contents.String)
-module Server = Irmin_server.Make (Store)
+module Store = Irmin_git_unix.FS.KV (Irmin.Contents.String)
+module Server = Irmin_server_unix.Make (Store)
 
 let info () = Store.Info.v ~author:"" ~message:"Saving data..." (Unix.gettimeofday () |> Int64.of_float)
 

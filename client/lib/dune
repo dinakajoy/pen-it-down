@@ -2,7 +2,7 @@
  (name store)
  (libraries 
   brr
-  irmin-client-jsoo
+  irmin-client.jsoo
   digestif.ocaml
   unix
   irmin

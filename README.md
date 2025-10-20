@@ -7,6 +7,6 @@ A simple note-taking app to test out `irmin-server` and `js_of_ocaml`
 - clone the repository
 - Run `make install` to install all project dependencies
 - Run `make start` to start the application
-- Open the `index.html` file in the browser to view the project frontend
+- Open the `dist/index.html` file in the browser to view the project frontend
 
 ## To test

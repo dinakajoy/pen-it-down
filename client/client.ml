@@ -119,6 +119,17 @@ let format_notes title content =
   let title_class = Jstr.v "note_title" in
   let title = [ El.txt (Jstr.v title) ] in
   let h2 = El.h2 ~at:At.[ class' title_class ] title in
+
+  (* Ev.listen Ev.click
+    (fun e ->
+      open_modal ();
+      let note_title_to_edit =
+        Jstr.to_string
+          (Jv.to_jstr (Jv.get (Jv.get (Ev.to_jv e) "target") "innerHTML"))
+      in
+      get_single_note note_title_to_edit)
+    (El.as_target h2); *)
+
   Ev.listen Ev.click
     (fun e ->
       open_modal ();
@@ -127,7 +138,8 @@ let format_notes title content =
           (Jv.to_jstr (Jv.get (Jv.get (Ev.to_jv e) "target") "innerHTML"))
       in
       get_single_note note_title_to_edit)
-    (El.as_target h2);
+    (El.as_target h2)
+  |> ignore;
   let delete_icon_class = Jstr.v "delete_icon" in
   let icon = [ El.txt (Jstr.v "Delete") ] in
   let delete_icon = El.span ~at:At.[ class' delete_icon_class ] icon in
@@ -140,7 +152,8 @@ let format_notes title content =
              "innerHTML")
       in
       delete_note note_title_to_delete)
-    (El.as_target delete_icon);
+    (El.as_target delete_icon)
+  |> ignore;
   El.append_children header_wrapper [ h2; delete_icon ];
   let content_class = Jstr.v "note_content" in
   let div = El.div ~at:At.[ class' content_class ] [] in
@@ -215,19 +228,20 @@ let main () =
     (Document.find_el_by_id G.document) (Jstr.v "new_note")
   in
   Option.iter
-    (fun elem ->
-      Ev.listen Ev.click
-        (fun _ ->
-          set_modal_default_values (Jstr.v "") (Jstr.v "");
-          open_modal ())
-        (El.as_target elem))
-    open_modal_btn;
+  (fun elem ->
+    Ev.listen Ev.click
+      (fun _ ->
+        set_modal_default_values (Jstr.v "") (Jstr.v "");
+        open_modal ())
+      (El.as_target elem)
+    |> ignore)
+  open_modal_btn;
   let close_modal_btn =
     (Document.find_el_by_id G.document) (Jstr.v "close_modal")
   in
   Option.iter
     (fun elem ->
-      Ev.listen Ev.click (fun _ -> Js_of_ocaml_lwt.Lwt_js_events.async close_modal) (El.as_target elem))
+      Ev.listen Ev.click (fun _ -> Js_of_ocaml_lwt.Lwt_js_events.async close_modal) (El.as_target elem) |> ignore)
     close_modal_btn;
   let markdown_content =
     (Document.find_el_by_id G.document) (Jstr.v "markdown_content")
@@ -241,7 +255,8 @@ let main () =
           in
           save_note_every_two_seconds value;
           preview_markdown value)
-          (El.as_target elem);
+          (El.as_target elem)
+          |> ignore;
           Lwt.return_unit
        | None -> Lwt.return ()
 

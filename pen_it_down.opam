@@ -11,18 +11,14 @@ author: "Odinaka Joy <dinakajoy@gmail.com> and Patrick Ferris <pf341@patricoferr
 maintainer: "Odinaka Joy <dinakajoy@gmail.com> and Patrick Ferris <pf341@patricoferris.com>"
 
 depends: [
-  "dune" {>= "2.8.0"} 
-  "js_of_ocaml-lwt" {= "4.0.0"}
+  "dune"
+  "js_of_ocaml-lwt"
   "js_of_ocaml-ppx"
-  "brr" {>= "0.0.3"}
-  "ocaml" {>= "4.12.1"}
-  "irmin" {>= "3.1.0"}
-  "irmin-git"
-  "irmin-mem"
-  "omd" {>= "2.0.0~alpha2"}
+  "brr"
+  "ocaml" {>= "4.14.1"} 
+  "omd"
 ]
+
 pin-depends: [
-  ["irmin-server.dev" "git+https://github.com/mirage/irmin-server#3ba5661e3513edac7fc8664179983e6ab5f05ac1"]
-  ["irmin-client-jsoo.dev" "git+https://github.com/mirage/irmin-server#3ba5661e3513edac7fc8664179983e6ab5f05ac1"]
-  ["irmin-indexeddb.dev" "git+https://github.com/patricoferris/irmin-indexeddb#5d870f08d0f63c2df0d76248cc453a0e2ca4b2bb"]
+  ["irmin-indexeddb" "git+https://github.com/patricoferris/irmin-indexeddb#5d870f08d0f63c2df0d76248cc453a0e2ca4b2bb"]
 ]
