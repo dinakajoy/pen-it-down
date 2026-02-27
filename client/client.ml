@@ -100,12 +100,6 @@ let save_note_every_two_seconds note_content =
       show_status result;
       Lwt.return ())
 
-let open_modal () =
-  let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
-  Option.iter
-    (fun elem -> El.(set_inline_style Style.display (Jstr.v "block") elem))
-    modal
-
 let get_single_note note_title_to_edit =
   Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
       let* store = Store.get_store () in
@@ -119,17 +113,6 @@ let format_notes title content =
   let title_class = Jstr.v "note_title" in
   let title = [ El.txt (Jstr.v title) ] in
   let h2 = El.h2 ~at:At.[ class' title_class ] title in
-
-  (* Ev.listen Ev.click
-    (fun e ->
-      open_modal ();
-      let note_title_to_edit =
-        Jstr.to_string
-          (Jv.to_jstr (Jv.get (Jv.get (Ev.to_jv e) "target") "innerHTML"))
-      in
-      get_single_note note_title_to_edit)
-    (El.as_target h2); *)
-
   Ev.listen Ev.click
     (fun e ->
       open_modal ();
@@ -203,9 +186,11 @@ let preview_markdown note_content =
         note_content_as_value markdown_preview_elem)
     markdown_preview_btn
 
-let push_str () =
-  let* _ = Store.push_store () in
-  Lwt.return ()
+let open_modal () =
+  let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
+  Option.iter
+    (fun elem -> El.(set_inline_style Style.display (Jstr.v "block") elem))
+    modal
 
 let close_modal () =
   let* () = push_str () in
@@ -218,6 +203,10 @@ let close_modal () =
 
 let pull_str () =
   let* _ = Store.pull_store () in
+  Lwt.return ()
+
+let push_str () =
+  let* _ = Store.push_store () in
   Lwt.return ()
 
 let main () =

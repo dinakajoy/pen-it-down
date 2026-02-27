@@ -8,7 +8,7 @@
 }
 
 body {
-  background-color: #f4f4f4;
+  background-color: #e7e3e3;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   color: #353434c9;
 }
@@ -62,12 +62,12 @@ header {
   background-color: #ffffff6e;
   padding: 8px;
   border-radius: 5px;
-  box-shadow: 2px 2px 0 #2b2b2b3b;
   transition: all .5s;
+  box-shadow: 0 0 0 #2b2b2b30;
 }
 
 .note:hover {
-  box-shadow: 0 0 0 #2b2b2b30;
+  box-shadow: 2px 2px 0 #2b2b2b3b;
   color: #333;
 }
 
@@ -98,7 +98,7 @@ header {
   text-decoration: underline;
 }
 
-.note_content {
+.note_content h2 {
   margin-left: 20px;
   font-size: .9rem;
 }
