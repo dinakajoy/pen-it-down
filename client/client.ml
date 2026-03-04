@@ -1,7 +1,8 @@
 open Brr
 open Lwt.Syntax
 
-let get_element_by_id id = (Document.find_el_by_id G.document) (Jstr.v id)
+let get_element_by_id id = 
+  (Document.find_el_by_id G.document) (Jstr.v id)
   
 let stop_loader () = 
   let loader = get_element_by_id "overlay" in
@@ -143,7 +144,8 @@ let format_notes title content =
              (Jv.get (Jv.get (Ev.to_jv e) "target") "previousElementSibling")
              "innerHTML")
       in
-      delete_note note_title_to_delete)
+      let () = delete_note note_title_to_delete in
+      Window.reload G.window)
     (El.as_target delete_icon)
   |> ignore;
   El.append_children header_wrapper [ h2; delete_icon ];
@@ -153,7 +155,7 @@ let format_notes title content =
     Jstr.v
       (Jstr.to_string
          (Jstr.concat
-            [ Jstr.slice ~start:0 ~stop:100 note_as_markdown; Jstr.v "..." ]))
+            [ Jstr.slice ~start:0 ~stop:200 note_as_markdown; Jstr.v "..." ]))
   in
   El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_value note_content;
   let section = El.section ~at:At.[ class' (Jstr.v "note") ] [] in
@@ -177,8 +179,10 @@ let display_notes elem =
   Lwt.return ()
 
 let list_notes () =
-  let note_list_div = Option.get @@ get_element_by_id "note_list" in
-  display_notes note_list_div
+  let note_list = get_element_by_id "note_list" in
+    match note_list with
+    | None -> Lwt.return_unit
+    | Some note_list_div -> display_notes note_list_div
 
 let preview_markdown note_content =
   let markdown_preview_btn = get_element_by_id "markdown_preview"

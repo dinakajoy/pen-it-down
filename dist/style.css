@@ -83,6 +83,7 @@ header {
   font-weight: 600;
   cursor: pointer;
   position: relative ;
+  color: #000000;
 }
 
 .note_title::after {

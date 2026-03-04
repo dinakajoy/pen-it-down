@@ -9,7 +9,18 @@ let main =
   let config = Irmin_git.config "penit" in
   let* store = Store.Repo.v config in
   let* main = Store.main store in
-  let* () = Store.set_exn ~info main [ "init" ] "# A markdown note!!" in
+  (* Check if store is empty and have a default note *)
+  let* root_contents = Store.list main [] in
+  let* () =
+    if root_contents = [] then
+      Store.set_exn
+        ~info
+        main
+        [ "Init" ]
+        "# A markdown note!!"
+    else
+      Lwt.return_unit
+  in
   let* server = Server.v ~uri config in
   let () = Format.printf "Listening on %a@." Uri.pp uri in
   Server.serve server
