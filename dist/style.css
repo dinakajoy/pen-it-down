@@ -98,9 +98,32 @@ header {
   text-decoration: underline;
 }
 
+.note_content {
+  margin-top: 20px;
+}
+
+.note_content h1 {
+  font-size: 1.2rem;
+}
+
 .note_content h2 {
-  margin-left: 20px;
+  font-size: 1.1rem;
+}
+
+.note_content h3 {
+  font-size: 1.0rem;
+}
+
+.note_content h4 {
   font-size: .9rem;
+}
+
+.note_content h5 {
+  font-size: .8rem;
+}
+
+.note_content h6 {
+  font-size: .7rem;
 }
 
 .note_content ol,
@@ -255,6 +278,11 @@ textarea {
   font-size: 90%;
   background-color: #0000000a;
   border-radius: 3px;
+}
+
+.markdown_preview p {
+  margin: 5px 0;
+  padding: 0.2em;
 }
 
 .markdown_preview p code {

@@ -5,31 +5,31 @@ module KV =
     (Irmin_indexeddb.Content_store)
     (Irmin_indexeddb.Branch_store)
 
-module Str = KV.Make (Irmin.Contents.String)
-module Client = Irmin_client_jsoo.Make (Str)
-module Sync = Irmin.Sync.Make (Str)
+module Store = KV.Make (Irmin.Contents.String)
+module Client = Irmin_client_jsoo.Make (Store)
+module Sync = Irmin.Sync.Make (Store)
 
 let cached_store = ref None
 
-let get_path key = Str.Schema.Path.v key
+let get_path key = Store.Schema.Path.v key
 
-let get_value t k = Str.get t k
+let get_value t k = Store.get t k
 
-let list t =
-  let* store_list = Str.list t [] in
+let list_store_content t =
+  let* store_list = Store.list t [] in
   Lwt.return @@ List.map fst store_list
 
 let info message () =
-  Str.Info.v
+  Store.Info.v
     (Unix.gettimeofday () |> Int64.of_float)
     ~author:"penit-client" ~message
 
 let temporary_save t k v =
-  let+ response = Str.set ~info:(info "Saving note") t k v in
+  let+ response = Store.set ~info:(info "Saving note") t k v in
   match response with Ok () -> "Saved..." | Error _ -> "Error saving..."
 
 let temporary_delete t k =
-  let+ response = Str.remove ~info:(info "Deleting note") t k in
+  let+ response = Store.remove ~info:(info "Deleting note") t k in
   match response with Ok () -> "Deleted..." | Error _ -> "Error deleting..."
 
 let get_store () =
@@ -37,8 +37,8 @@ let get_store () =
   | Some s -> Lwt.return s
   | None ->
     let config = Irmin_indexeddb.config "penit" in
-    let* store_repo = Str.Repo.v config in
-    let* store = Str.main store_repo in
+    let* store_repo = Store.Repo.v config in
+    let* store = Store.main store_repo in
     cached_store := Some store;
     Lwt.return store
 

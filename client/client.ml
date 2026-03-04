@@ -1,18 +1,36 @@
 open Brr
 open Lwt.Syntax
 
-let get_loader_elem = (Document.find_el_by_id G.document) (Jstr.v "overlay")
-
-let get_content_wrapper = (Document.find_el_by_id G.document) (Jstr.v "content")
+let get_element_by_id id = (Document.find_el_by_id G.document) (Jstr.v id)
   
 let stop_loader () = 
-  let loader = get_loader_elem in
+  let loader = get_element_by_id "overlay" in
   Option.iter(fun elem -> El.(set_inline_style Style.display (Jstr.v "none") elem)) loader;
-  let content = get_content_wrapper in
+  let content = get_element_by_id "content" in
   Option.iter(fun elem -> El.(set_inline_style Style.display (Jstr.v "block") elem)) content
 
+let open_modal () =
+  let modal = get_element_by_id "note_modal" in
+  Option.iter
+    (fun elem -> El.(set_inline_style Style.display (Jstr.v "block") elem))
+    modal
+
+let close_modal () =
+  let modal = get_element_by_id "note_modal" in
+  Option.iter
+    (fun elem -> El.(set_inline_style Style.display (Jstr.v "none") elem))
+    modal
+
+let pull_str () =
+  let* _ = Store.pull_store () in
+  Lwt.return ()
+
+let push_str () =
+  let* _ = Store.push_store () in
+  Lwt.return ()
+
 let display_status status =
-  let status_element = (Document.find_el_by_id G.document) (Jstr.v "status") in
+  let status_element = get_element_by_id "status" in
   Option.iter
     (fun elem ->
       El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) (Jstr.v status) elem)
@@ -28,8 +46,7 @@ let show_status msg =
   set_timeout ~ms:2000 @@ fun () -> display_status ""
 
 let get_note_name () =
-  let markdown_name_elem =
-    (Document.find_el_by_id G.document) (Jstr.v "markdown_name")
+  let markdown_name_elem = get_element_by_id "markdown_name"
   in
   match markdown_name_elem with
   | Some elem ->
@@ -46,20 +63,17 @@ let get_note_name () =
   | None -> "new_note"
 
 let set_modal_default_values note_title note_content =
-  let markdown_name_elem =
-    (Document.find_el_by_id G.document) (Jstr.v "markdown_name")
+  let markdown_name_elem = get_element_by_id "markdown_name"
   in
   Option.iter
     (fun elem -> El.set_prop (El.Prop.jstr (Jstr.v "value")) note_title elem)
     markdown_name_elem;
-  let markdown_content =
-    (Document.find_el_by_id G.document) (Jstr.v "markdown_content")
+  let markdown_content = get_element_by_id "markdown_content"
   in
   Option.iter
     (fun elem -> El.set_prop (El.Prop.jstr (Jstr.v "value")) note_content elem)
     markdown_content;
-  let markdown_preview =
-    (Document.find_el_by_id G.document) (Jstr.v "markdown_preview")
+  let markdown_preview = get_element_by_id "markdown_preview"
   in
   Option.iter
     (fun markdown_preview_elem ->
@@ -83,7 +97,7 @@ let delete_note note_name =
     Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
       let* store = Store.get_store () in
       let* _ = Store.temporary_delete store path in
-      let* _ = Store.push_store () in
+      let* () = push_str () in
       Lwt.return ())
 
 let save_note_every_two_seconds note_content =
@@ -108,11 +122,8 @@ let get_single_note note_title_to_edit =
       Lwt.return ())
 
 let format_notes title content =
-  let header_wrapper_class = Jstr.v "header_wrapper" in
-  let header_wrapper = El.div ~at:At.[ class' header_wrapper_class ] [] in
-  let title_class = Jstr.v "note_title" in
-  let title = [ El.txt (Jstr.v title) ] in
-  let h2 = El.h2 ~at:At.[ class' title_class ] title in
+  let header_wrapper = El.div ~at:At.[ class' (Jstr.v "header_wrapper") ] [] in
+  let h2 = El.h2 ~at:At.[ class' (Jstr.v "note_title") ] [ El.txt (Jstr.v title) ] in
   Ev.listen Ev.click
     (fun e ->
       open_modal ();
@@ -123,9 +134,7 @@ let format_notes title content =
       get_single_note note_title_to_edit)
     (El.as_target h2)
   |> ignore;
-  let delete_icon_class = Jstr.v "delete_icon" in
-  let icon = [ El.txt (Jstr.v "Delete") ] in
-  let delete_icon = El.span ~at:At.[ class' delete_icon_class ] icon in
+  let delete_icon = El.span ~at:At.[ class' (Jstr.v "delete_icon") ] [ El.txt (Jstr.v "Delete") ] in
   Ev.listen Ev.click
     (fun e ->
       let note_title_to_delete =
@@ -138,8 +147,7 @@ let format_notes title content =
     (El.as_target delete_icon)
   |> ignore;
   El.append_children header_wrapper [ h2; delete_icon ];
-  let content_class = Jstr.v "note_content" in
-  let div = El.div ~at:At.[ class' content_class ] [] in
+  let note_content = El.div ~at:At.[ class' (Jstr.v "note_content") ] [] in
   let note_as_markdown = Jstr.v (Omd.to_html (Omd.of_string content)) in
   let note_content_as_value =
     Jstr.v
@@ -147,9 +155,9 @@ let format_notes title content =
          (Jstr.concat
             [ Jstr.slice ~start:0 ~stop:100 note_as_markdown; Jstr.v "..." ]))
   in
-  El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_value div;
+  El.set_prop (El.Prop.jstr (Jstr.v "innerHTML")) note_content_as_value note_content;
   let section = El.section ~at:At.[ class' (Jstr.v "note") ] [] in
-  El.append_children section [ header_wrapper; div ];
+  El.append_children section [ header_wrapper; note_content ];
   section
 
 let rec get_contents store files elem =
@@ -164,17 +172,16 @@ let rec get_contents store files elem =
 let display_notes elem =
   El.set_children elem [];
   let* store = Store.get_store () in
-  let* files = Store.list store in
+  let* files = Store.list_store_content store in
   let* () = get_contents store files elem in
   Lwt.return ()
 
 let list_notes () =
-  let note_list_div = Option.get @@ (Document.find_el_by_id G.document) (Jstr.v "note_list") in
+  let note_list_div = Option.get @@ get_element_by_id "note_list" in
   display_notes note_list_div
 
 let preview_markdown note_content =
-  let markdown_preview_btn =
-    (Document.find_el_by_id G.document) (Jstr.v "markdown_preview")
+  let markdown_preview_btn = get_element_by_id "markdown_preview"
   in
   Option.iter
     (fun markdown_preview_elem ->
@@ -186,35 +193,11 @@ let preview_markdown note_content =
         note_content_as_value markdown_preview_elem)
     markdown_preview_btn
 
-let open_modal () =
-  let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
-  Option.iter
-    (fun elem -> El.(set_inline_style Style.display (Jstr.v "block") elem))
-    modal
-
-let close_modal () =
-  let* () = push_str () in
-  let modal = (Document.find_el_by_id G.document) (Jstr.v "note_modal") in
-  match modal with
-    | None -> Lwt.return ()
-    | Some modal ->
-      let+ () = list_notes () in
-      El.set_inline_style El.Style.display (Jstr.v "none") modal
-
-let pull_str () =
-  let* _ = Store.pull_store () in
-  Lwt.return ()
-
-let push_str () =
-  let* _ = Store.push_store () in
-  Lwt.return ()
-
 let main () =
   let* () = pull_str () in
   let* () = list_notes () in
   stop_loader ();
-  let open_modal_btn =
-    (Document.find_el_by_id G.document) (Jstr.v "new_note")
+  let start_new_note = get_element_by_id "new_note"
   in
   Option.iter
   (fun elem ->
@@ -224,16 +207,23 @@ let main () =
         open_modal ())
       (El.as_target elem)
     |> ignore)
-  open_modal_btn;
-  let close_modal_btn =
-    (Document.find_el_by_id G.document) (Jstr.v "close_modal")
+  start_new_note;
+  let close_modal_btn = get_element_by_id "close_modal"
   in
   Option.iter
     (fun elem ->
-      Ev.listen Ev.click (fun _ -> Js_of_ocaml_lwt.Lwt_js_events.async close_modal) (El.as_target elem) |> ignore)
-    close_modal_btn;
-  let markdown_content =
-    (Document.find_el_by_id G.document) (Jstr.v "markdown_content")
+      Ev.listen Ev.click
+  (fun _ ->
+     Js_of_ocaml_lwt.Lwt_js_events.async (fun () ->
+       let open Lwt.Syntax in
+       let* () = push_str () in
+       let* () = list_notes () in
+       close_modal ();
+       Lwt.return_unit))
+  (El.as_target elem)
+|> ignore)
+  close_modal_btn;
+  let markdown_content = get_element_by_id "markdown_content"
   in
   match markdown_content with
   | Some elem ->
