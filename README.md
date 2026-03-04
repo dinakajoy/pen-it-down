@@ -2,7 +2,7 @@
 
 Penit is an offline-first Markdown note-taking web application built entirely in **OCaml**.
 
-![Demo](./Note_App.mp4)
+![Demo](./Note_App.gif)
 
 It uses:
 
